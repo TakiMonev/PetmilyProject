@@ -6,6 +6,7 @@ import com.example.backend.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import com.example.backend.service.UserService;
 
@@ -36,13 +37,18 @@ public class UserController {
 
     @GetMapping("/current-user")
     public ResponseEntity<UserRequest> getCurrentUser() {
-        String authorizationHeader = request.getHeader("Authorization");
-        if (authorizationHeader != null && authorizationHeader.startsWith("Bearer ")) {
-            String token = authorizationHeader.substring(7);
-            String username = userService.getUsernameFromToken(token);
-            UserRequest userRequest = userService.getUserByUsername(username);
-            return ResponseEntity.ok(userRequest);
+        try {
+            String authorizationHeader = request.getHeader("Authorization");
+            if (authorizationHeader != null && authorizationHeader.startsWith("Bearer ")) {
+                String token = authorizationHeader.substring(7);
+                String username = userService.getUsernameFromToken(token);
+                UserRequest userRequest = userService.getUserByUsername(username);
+                return ResponseEntity.ok(userRequest);
+            } else {
+                throw new IllegalArgumentException("Invalid Authorization header");
+            }
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
-        return ResponseEntity.badRequest().build();
     }
 }

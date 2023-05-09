@@ -11,6 +11,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.security.core.AuthenticationException;
 
+import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 import java.util.HashMap;
 import java.util.Map;
@@ -32,13 +34,14 @@ public class AuthController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<AuthenticationResponse> login(@RequestBody Map<String, String> request) {
+    public ResponseEntity<Map<String, String>> login(@RequestBody Map<String, String> request, HttpServletResponse response) {
         try {
             String email = request.get("email");
             String password = request.get("password");
-            String token = authService.login(email, password);
-            AuthenticationResponse response = new AuthenticationResponse(token);
-            return ResponseEntity.ok(response);
+            String token = authService.login(email, password, response);
+            Map<String, String> responseBody = new HashMap<>();
+            responseBody.put("token", token);
+            return ResponseEntity.ok(responseBody);
         } catch (AuthenticationException e) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }

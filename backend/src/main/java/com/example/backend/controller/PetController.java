@@ -6,6 +6,7 @@ import com.example.backend.repository.PetRepository;
 import com.example.backend.service.PetService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.modelmapper.ModelMapper;
 import com.example.backend.repository.UserRepository;
@@ -30,6 +31,7 @@ public class PetController {
     private HttpServletRequest request;
 
     @PostMapping
+    @PreAuthorize("hasAuthority('ROLE_USER')")
     public ResponseEntity<PetService> createPet(@RequestBody PetService petService) {
         Pet pet = modelMapper.map(petService, Pet.class);
         Pet savedPet = petRepository.save(pet);

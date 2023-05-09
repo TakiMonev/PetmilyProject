@@ -30,10 +30,10 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .authorizeRequests()
                 .antMatchers("/auth/login").permitAll()
                 .antMatchers("/auth/signup").permitAll()
-                .antMatchers("/users").authenticated()
-                .antMatchers("/pet").authenticated()
-                .anyRequest().authenticated()
-                .and()
-                .headers().frameOptions().disable(); // add this line if you use H2 database
+                .antMatchers("/users/**").hasAuthority("ROLE_USER")
+                .antMatchers("/pet/**").hasAuthority("ROLE_USER")
+                //.anyRequest().authenticated()
+                .and();
+                //.headers().frameOptions().disable(); // add this line if you use H2 database
     }
 }
